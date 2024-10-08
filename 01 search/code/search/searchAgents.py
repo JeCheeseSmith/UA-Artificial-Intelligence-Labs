@@ -375,7 +375,33 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
     #je kan er gebruik van maken van manhattendistance maar meer is nodig
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+
+    # cornersvisited checken
+
+    # als 1 hoek uitgegaan, prefereer de corner op zelfde x/y as
+
+    cornersVisited = state[1]
+    spots = []
+    for i in range(len(corners)):
+        print(i)
+        if not cornersVisited[i]:
+            xy1 = state[0]
+            xy2 = corners[i]
+            manhattan = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+            euclidean = ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
+
+            result = manhattan
+
+            nrWalls = walls
+
+            spots.append( result)
+
+    heuristic = min(spots)
+
+    # value for the sum of the 4 manhatten distances?"
+    # number of walls in between?
+
+    return heuristic
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
