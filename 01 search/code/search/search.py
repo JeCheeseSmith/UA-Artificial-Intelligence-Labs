@@ -107,15 +107,11 @@ def breadthFirstSearch(problem: SearchProblem):
     frontier.push((problem.getStartState() , []))
 
     while not frontier.isEmpty():
-        node , path = frontier.pop()
+        node, path = frontier.pop()
         if problem.isGoalState(node):
             return path
         if not (node in visited):
             visited.add(node)
-            #print(problem.getSuccessors(node))
-            #[((19, 2), 'East', 1), ((17, 2), 'West', 1)]
-            #[((4, 6), 'North', 1), ((5, 5), 'East', 1), ((3, 5), 'West', 1)]
-
             for successor, action, cost in problem.getSuccessors(node):
                 frontier.push((successor, path + [action] ))
     return []
