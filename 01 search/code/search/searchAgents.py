@@ -290,6 +290,9 @@ class CornersProblem(search.SearchProblem):
                 print('Warning: no food in corner ' + str(corner))
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
 
+        # For display purposes
+        self._visited, self._visitedlist= {}, []  # DO NOT CHANGE
+
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
@@ -308,7 +311,15 @@ class CornersProblem(search.SearchProblem):
             cornersVisited[index] = True
             cornersVisited = tuple(cornersVisited)
             state = ( state[0], cornersVisited)
-        return state[1][0] and state[1][1] and state[1][2] and state[1][3]
+
+        isGoal = state[1][0] and state[1][1] and state[1][2] and state[1][3]
+
+        if isGoal:
+            import __main__
+            if '_display' in dir(__main__):
+                if 'drawExpandedCells' in dir(__main__._display):  # @UndefinedVariable
+                    __main__._display.drawExpandedCells(self._visitedlist)  # @UndefinedVariable
+        return isGoal
 
     def getSuccessors(self, state: Any):
         """
@@ -337,6 +348,10 @@ class CornersProblem(search.SearchProblem):
                     cornersVisited = list(state[1])
                     cornersVisited[index] = True
                     cornersVisited = tuple(cornersVisited)
+
+                if state not in self._visited:
+                    self._visited[state] = True
+                    self._visitedlist.append(state)
 
                 successors.append( ( ( (nextx, nexty), cornersVisited), action, 1) )
 
@@ -383,7 +398,6 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     cornersVisited = state[1]
     spots = []
     for i in range(len(corners)):
-        print(i)
         if not cornersVisited[i]:
             xy1 = state[0]
             xy2 = corners[i]

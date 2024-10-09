@@ -561,7 +561,7 @@ class PacmanGraphics:
         x, y = cell
         remove_from_screen(capsuleImages[(x, y)])
 
-    def drawExpandedCells(self, cells):
+    def drawExpandedCells(self, cells, adaptedByWatson=False):
         """
         Draws an overlay of expanded grid positions for search agents
         """
@@ -570,7 +570,10 @@ class PacmanGraphics:
         self.clearExpandedCells()
         self.expandedCells = []
         for k, cell in enumerate(cells):
-            screenPos = self.to_screen( cell)
+            if adaptedByWatson:
+                screenPos = self.to_screen( cell[0] )
+            else:
+                screenPos = self.to_screen(cell)
             cellColor = formatColor(*[(n-k) * c * .5 / n + .25 for c in baseColor])
             block = square(screenPos,
                      0.5 * self.gridSize,
