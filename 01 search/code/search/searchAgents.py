@@ -318,7 +318,7 @@ class CornersProblem(search.SearchProblem):
             import __main__
             if '_display' in dir(__main__):
                 if 'drawExpandedCells' in dir(__main__._display):  # @UndefinedVariable
-                    __main__._display.drawExpandedCells(self._visitedlist)  # @UndefinedVariable
+                    __main__._display.drawExpandedCells(self._visitedlist, True)  # @UndefinedVariable
         return isGoal
 
     def getSuccessors(self, state: Any):
@@ -388,12 +388,12 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-    #je kan er gebruik van maken van manhattendistance maar meer is nodig
     "*** YOUR CODE HERE ***"
 
-    # cornersvisited checken
-
+    # Some ideas/sparks
     # als 1 hoek uitgegaan, prefereer de corner op zelfde x/y as
+    # value for the sum of the 4 manhatten distances?
+    # number of walls in between?
 
     cornersVisited = state[1]
     spots = []
@@ -404,16 +404,37 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
             manhattan = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
             euclidean = ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
-            result = manhattan
+            """"Results in more expansion """
+            # if manhattan < euclidean:
+            #      result = manhattan
+            # else:
+            #      result = euclidean
 
-            nrWalls = walls
+            """"This gives 1205 nodes"""
+            #result = (manhattan + euclidean) / 2
 
-            spots.append( result)
+            """Makes it inconsistent"""
+            # if state in problem._visited:
+            #     result /= 2
 
-    heuristic = min(spots)
+            """Somehow this works with taking the max()"""
+            result = manhattan  # Better
 
-    # value for the sum of the 4 manhatten distances?"
-    # number of walls in between?
+            spots.append(result)
+
+    """This is inconsistent"""
+    #heuristic = min(spots) * len(spots) # Je rekent harder/zachter welke kant je uitgaat want je wilt als je naar links boven bent gegaan, de rechter onderhoek niet bezoeken als eerste maar inconsistent
+
+    """I considered this as the best logical option"""
+    #heuristic = min(spots)
+
+    """Sparkle idea"""
+    #heuristic = max(spots) / len(spots)
+
+    """Somehow this is better then minimum since it might uuh, go for a more worstcase scenario? Can't yet really explain why"""
+    heuristic = max(spots)
+
+    """General conclusion: Inconsistent heuristic might result in less nodes expanded. Finding the balance is key."""
 
     return heuristic
 
