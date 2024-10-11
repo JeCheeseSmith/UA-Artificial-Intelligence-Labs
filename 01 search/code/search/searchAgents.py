@@ -314,11 +314,12 @@ class CornersProblem(search.SearchProblem):
 
         isGoal = state[1][0] and state[1][1] and state[1][2] and state[1][3]
 
-        if isGoal:
-            import __main__
-            if '_display' in dir(__main__):
-                if 'drawExpandedCells' in dir(__main__._display):  # @UndefinedVariable
-                    __main__._display.drawExpandedCells(self._visitedlist, True)  # @UndefinedVariable
+        """Only used for debug purpose"""
+        # if isGoal:
+        #     import __main__
+        #     if '_display' in dir(__main__):
+        #         if 'drawExpandedCells' in dir(__main__._display):  # @UndefinedVariable
+        #             __main__._display.drawExpandedCells(self._visitedlist, True)  # @UndefinedVariable
         return isGoal
 
     def getSuccessors(self, state: Any):
@@ -349,6 +350,7 @@ class CornersProblem(search.SearchProblem):
                     cornersVisited[index] = True
                     cornersVisited = tuple(cornersVisited)
 
+                """Only used for debug purpose"""
                 if state not in self._visited:
                     self._visited[state] = True
                     self._visitedlist.append(state)
@@ -461,11 +463,23 @@ class FoodSearchProblem:
         self._expanded = 0 # DO NOT CHANGE
         self.heuristicInfo = {} # A dictionary for the heuristic to store information
 
+        # For display purposes
+        self._visited, self._visitedlist= {}, []  # DO NOT CHANGE
+
     def getStartState(self):
         return self.start
 
     def isGoalState(self, state):
-        return state[1].count() == 0
+        isGoal = state[1].count() == 0
+
+        """Only used for debug purpose"""
+        # if isGoal:
+        #     import __main__
+        #     if '_display' in dir(__main__):
+        #         if 'drawExpandedCells' in dir(__main__._display):  # @UndefinedVariable
+        #             __main__._display.drawExpandedCells(self._visitedlist, True)  # @UndefinedVariable
+
+        return isGoal
 
     def getSuccessors(self, state):
         "Returns successor states, the actions they require, and a cost of 1."
@@ -476,6 +490,12 @@ class FoodSearchProblem:
             dx, dy = Actions.directionToVector(direction)
             nextx, nexty = int(x + dx), int(y + dy)
             if not self.walls[nextx][nexty]:
+
+                # """Only used for debug purpose"""
+                # if state not in self._visited:
+                #     self._visited[state] = True
+                #     self._visitedlist.append(state)
+
                 nextFood = state[1].copy()
                 nextFood[nextx][nexty] = False
                 successors.append( ( ((nextx, nexty), nextFood), direction, 1) )
@@ -531,7 +551,30 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+
+    if problem.isGoalState(state):
+        return 0
+    foods = foodGrid.asList()
+
+    max = [ (0,0) , (0,0) , 0 ]
+    for xy1 in foods:
+        for xy2 in foods:
+            manhattan = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+            if manhattan > max[2]:
+                max = [xy1, xy2, manhattan]
+
+    if max[2] == 0:  # This means there is only 1 food
+        xy1 = state[0]
+        xy2 = foods[0]
+        return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
+    xy1 = state[0]
+    xy2 = max[0]
+    manhattan1 = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+    xy2 = max[1]
+    manhattan2 = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
+    return max[2] + min(manhattan1, manhattan2)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
