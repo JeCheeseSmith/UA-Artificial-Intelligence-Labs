@@ -405,39 +405,14 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
             xy1 = state[0]
             xy2 = corners[i]
             manhattan = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
-            # euclidean = ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
-
-            """"Results in more expansion """
-            # if manhattan < euclidean:
-            #      result = manhattan
-            # else:
-            #      result = euclidean
-
-            """"This gives 1205 nodes"""
-            # result = (manhattan + euclidean) / 2
-
-            """Makes it inconsistent"""
-            # if state in problem._visited:
-            #     result /= 2
 
             """Somehow this works with taking the max()"""
             result = manhattan  # Better
 
             spots.append(result)
 
-    """This is inconsistent"""
-    # heuristic = min(spots) * len(spots) # Je rekent harder/zachter welke kant je uitgaat want je wilt als je naar links boven bent gegaan, de rechter onderhoek niet bezoeken als eerste maar inconsistent
-
-    """I considered this as the best logical option"""
-    # heuristic = min(spots)
-
-    """Sparkle idea"""
-    # heuristic = max(spots) / len(spots)
-
     """Somehow this is better then minimum since it might uuh, go for a more worstcase scenario? Can't yet really explain why"""
     heuristic = max(spots)
-
-    """General conclusion: Inconsistent heuristic might result in less nodes expanded. Finding the balance is key."""
 
     return heuristic
 
