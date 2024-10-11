@@ -405,16 +405,9 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
             xy1 = state[0]
             xy2 = corners[i]
             manhattan = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
-
-            """Somehow this works with taking the max()"""
-            result = manhattan  # Better
-
+            result = manhattan
             spots.append(result)
-
-    """Somehow this is better then minimum since it might uuh, go for a more worstcase scenario? Can't yet really explain why"""
-    heuristic = max(spots)
-
-    return heuristic
+    return max(spots)
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
