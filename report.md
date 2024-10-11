@@ -10,19 +10,19 @@
 
 **Describe your heuristic for question 6:**
 
-- [short description here]
+- I consider the manhattan distance to corners Pacman didn't yet visit. Then I take the maximum distance to these corners I considered. 
 
-- **Admissibility:** [Discuss its admissibility]
-- **Consistency:** [Discuss its consistency ]
+- **Admissibility:** The longest distance to a corner Pacman did not yet visit, is a minimum distance that Pacman would always need to travel to pass by the other corner(s).
+- **Consistency:** The heuristic is consistent because the next heuristic value doesn't decrease for the first 3 corner-visits (meaning that h(i) - h(i+1) is negative, thus less than the cost 1). 
 
 
 
 **Describe your heuristic for question 7:**
 
-- I take the maximum distance between 2 coins added with the minimum distance from pacman to one of these coins. 
+- I take the maximum (manhattan) distance between 2 coins added with the minimum (manhattan) distance from pacman to one of these coins. (2 Edge cases exists when there are less than 2 coins, see code)
 
 - **Admissibility:** It is admissible since Pacman would always at least need to travel this distance to reach the coins.
-- **Consistency:** Considering 3 coins, the heuristic value would not 
+- **Consistency:** Considering at least 3 coins, the heuristic value doesn't drop too hard when 1 gets eaten.  
 
 
 
