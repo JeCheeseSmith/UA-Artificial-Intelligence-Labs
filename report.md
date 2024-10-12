@@ -1,8 +1,8 @@
 # Artificial Intelligence - Report
 
-**Name:** [Kars van Velzen]
+**Name:** Kars van Velzen
 
-**Student number:** [s0223956]
+**Student number:** s0223956
 
 
 
