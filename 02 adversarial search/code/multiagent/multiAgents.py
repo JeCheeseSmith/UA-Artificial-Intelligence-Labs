@@ -10,7 +10,7 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
+import math
 
 from util import manhattanDistance
 from game import Directions
@@ -71,11 +71,20 @@ class ReflexAgent(Agent):
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
-        newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        #newGhostStates = successorGameState.getGhostStates()
+        #newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        #Calc closest ghost
+        ghostPositions = [state.getPosition() for state in successorGameState.getGhostStates()]
+        closest_ghost_distance = min(manhattanDistance(newPos, ghost_pos ) for ghost_pos in ghostPositions)
+        closest_ghost_distance = -math.inf if closest_ghost_distance == 0 else closest_ghost_distance
+
+        #Calc closest foods
+        foods = newFood.asList()
+        closest_food_dist = min(manhattanDistance(newPos, food_pos) for food_pos in foods) if foods else 0
+
+        score = successorGameState.getScore() + closest_ghost_distance - closest_food_dist
+        return score
 
 def scoreEvaluationFunction(currentGameState: GameState):
     """
