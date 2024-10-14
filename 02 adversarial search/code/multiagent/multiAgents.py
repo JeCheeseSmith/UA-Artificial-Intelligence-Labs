@@ -144,7 +144,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
-        "*** YOUR CODE HERE ***"
         best_val, best_action = self.value(gameState, agentIdx=0, remainingDepth=self.depth)
         return best_action
 
@@ -157,7 +156,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         for act in legal_actions:
             successor = state.generateSuccessor(agentIdx, act)
             val, _ = self.value(successor, (agentIdx + 1) % state.getNumAgents(), remainingDepth)
-            if best_val < val:  #max
+            if best_val < val:  # max
                 best_val = val
                 best_action = act
 
@@ -176,15 +175,15 @@ class MinimaxAgent(MultiAgentSearchAgent):
         for act in legal_actions:
             successor = state.generateSuccessor(agentIdx, act)
             val, _ = self.value(successor, (agentIdx + 1) % state.getNumAgents(), remainingDepth)
-            if best_val > val: # min
+            if best_val > val:  # min
                 best_val = val
                 best_action = act
 
         return best_val, best_action
 
     def value(self, state, agentIdx, remainingDepth):
-        if state.isWin() or state.isLose() or remainingDepth == 0: # Terminal
-            return self.evaluationFunction(state) , None
+        if state.isWin() or state.isLose() or remainingDepth == 0:  # Terminal
+            return self.evaluationFunction(state), None
         elif agentIdx == 0:  # Max
             return self.max_value(state, agentIdx, remainingDepth)
         else:  # Min
@@ -195,12 +194,65 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     Your minimax agent with alpha-beta pruning (question 3)
     """
 
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
+        super().__init__(evalFn, depth)
+        self.alfa = - math.inf
+        self.beta = + math.inf
+
     def getAction(self, gameState: GameState):
         """
         Returns the minimax action using self.depth and self.evaluationFunction
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        best_val, best_action = self.value(gameState, 0, self.depth, self.alfa, self.beta)
+        return best_action
+
+    def max_value(self, state, agentIdx, remainingDepth, alfa, beta):
+        assert agentIdx == 0
+        best_val = - math.inf
+        best_action = None
+        legal_actions = state.getLegalActions(agentIdx)
+
+        for act in legal_actions:
+            successor = state.generateSuccessor(agentIdx, act)
+            val, _ = self.value(successor, (agentIdx + 1) % state.getNumAgents(), remainingDepth, alfa, beta)
+            if best_val < val:  # max
+                best_val = val
+                best_action = act
+            if best_val > beta:
+                return best_val, best_action
+            alfa = max(alfa, best_val)
+
+        return best_val, best_action
+
+    def min_value(self, state, agentIdx, remainingDepth, alfa, beta):
+        assert agentIdx > 0
+
+        # decr reaming depth for final ghost
+        if agentIdx == state.getNumAgents() - 1:
+            remainingDepth -= 1
+
+        best_val = + math.inf
+        best_action = None
+        legal_actions = state.getLegalActions(agentIdx)
+        for act in legal_actions:
+            successor = state.generateSuccessor(agentIdx, act)
+            val, _ = self.value(successor, (agentIdx + 1) % state.getNumAgents(), remainingDepth, alfa, beta)
+            if best_val > val:  # min
+                best_val = val
+                best_action = act
+            if best_val < alfa:
+                return best_val, best_action
+            beta = min(beta, best_val)
+
+        return best_val, best_action
+
+    def value(self, state, agentIdx, remainingDepth, alfa, beta):
+        if state.isWin() or state.isLose() or remainingDepth == 0:  # Terminal
+            return self.evaluationFunction(state), None
+        elif agentIdx == 0:  # Max
+            return self.max_value(state, agentIdx, remainingDepth, alfa, beta)
+        else:  # Min
+            return self.min_value(state, agentIdx, remainingDepth, alfa, beta)
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
