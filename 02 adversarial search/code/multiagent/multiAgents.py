@@ -266,8 +266,48 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         All ghosts should be modeled as choosing uniformly at random from their
         legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        best_val, best_action = self.value(gameState, agentIdx=0, remainingDepth=self.depth)
+        return best_action
+
+    def max_value(self, state, agentIdx, remainingDepth):
+        assert agentIdx == 0
+
+        best_val = - math.inf
+        best_action = None
+        legal_actions = state.getLegalActions(agentIdx)
+        for act in legal_actions:
+            successor = state.generateSuccessor(agentIdx, act)
+            val, _ = self.value(successor, (agentIdx + 1) % state.getNumAgents(), remainingDepth)
+            if best_val < val:  # max
+                best_val = val
+                best_action = act
+
+        return best_val, best_action
+
+    def exp_value(self, state, agentIdx, remainingDepth):
+        assert agentIdx > 0
+
+        # decr reaming depth for final ghost
+        if agentIdx == state.getNumAgents() - 1:
+            remainingDepth -= 1
+
+        best_val = 0
+        best_action = None
+        legal_actions = state.getLegalActions(agentIdx)
+        for act in legal_actions:
+            successor = state.generateSuccessor(agentIdx, act)
+            val, _ = self.value(successor, (agentIdx + 1) % state.getNumAgents(), remainingDepth)
+            best_val += val  # Assuming probability p == 1
+
+        return best_val, best_action
+
+    def value(self, state, agentIdx, remainingDepth):
+        if state.isWin() or state.isLose() or remainingDepth == 0:  # Terminal
+            return self.evaluationFunction(state), None
+        elif agentIdx == 0:  # Max
+            return self.max_value(state, agentIdx, remainingDepth)
+        else:  # Min
+            return self.exp_value(state, agentIdx, remainingDepth)
 
 def betterEvaluationFunction(currentGameState: GameState):
     """
