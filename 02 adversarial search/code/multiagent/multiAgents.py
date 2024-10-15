@@ -299,7 +299,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             val, _ = self.value(successor, (agentIdx + 1) % state.getNumAgents(), remainingDepth)
             best_val += val  # Assuming probability p == 1
 
-        return best_val, best_action
+        return best_val/len(legal_actions), best_action
 
     def value(self, state, agentIdx, remainingDepth):
         if state.isWin() or state.isLose() or remainingDepth == 0:  # Terminal
