@@ -60,7 +60,7 @@ class CSP(ABC):
             :param assignment: dict (Variable -> value)
         """
         # TODO: Implement CSP::isComplete (problem 1)
-        pass
+        return len(self.remainingVariables(assignment)) == 0
 
     @abstractmethod
     def isValidPairwise(self, var1: Variable, val1: Value, var2: Variable, val2: Value) -> bool:
@@ -75,8 +75,22 @@ class CSP(ABC):
             Hint: use `CSP::neighbors` and `CSP::isValidPairwise` to check that all binary constraints are satisfied.
             Note that constraints are symmetrical, so you don't need to check them in both directions.
         """
-        # TODO: Implement CSP::isValid (problem 1)
-        pass
+
+        checked = set()
+
+        for tup in assignment.keys():
+            var = tup
+            val = assignment[var]
+            neighbors = self.neighbors(var)
+            for neighbor in neighbors:
+                if neighbor in checked:
+                    continue
+                if assignment.get(neighbor) is None:
+                    continue
+                if not self.isValidPairwise(var, val, neighbor, assignment[neighbor]):
+                    return False
+            checked.add(var)
+        return True
 
     def solveBruteForce(self, initialAssignment: Dict[Variable, Value] = dict()) -> Optional[Dict[Variable, Value]]:
         """ Called to solve this CSP with brute force technique.
@@ -90,8 +104,21 @@ class CSP(ABC):
             Use `CSP::isComplete`, `CSP::isValid`, `CSP::selectVariable` and `CSP::orderDomain`.
             :return: a complete and valid assignment if one exists, None otherwise.
         """
-        # TODO: Implement CSP::_solveBruteForce (problem 1)
-        pass
+        if self.isComplete(assignment):
+            return assignment
+
+        var = self.selectVariable(assignment, domains)
+        #for var in self.remainingVariables(assignment, domains):
+        for value in self.orderDomain(assignment, domains, var):
+            temp = copy.deepcopy(assignment)
+            temp[var] = value
+            if self.isValid(temp):
+               assignment[var] = value
+               if self._solveBruteForce(assignment, domains) is None:
+                   assignment.pop(var)
+               else:
+                   return assignment
+        return None
 
     def solveForwardChecking(self, initialAssignment: Dict[Variable, Value] = dict()) -> Optional[Dict[Variable, Value]]:
         """ Called to solve this CSP with forward checking.
@@ -108,7 +135,22 @@ class CSP(ABC):
             :return: a complete and valid assignment if one exists, None otherwise.
         """
         # TODO: Implement CSP::_solveForwardChecking (problem 2)
-        pass
+        if self.isComplete(assignment):
+            return assignment
+
+        var = self.selectVariable(assignment, domains)
+        # for var in self.remainingVariables(assignment, domains):
+        for value in self.orderDomain(assignment, domains, var):
+            temp = copy.deepcopy(assignment)
+            temp[var] = value
+            if self.isValid(temp):
+                assignment[var] = value
+                newdomains = self.forwardChecking(assignment, copy.deepcopy(domains), var)
+                if self._solveForwardChecking(assignment, newdomains) is None:
+                    assignment.pop(var)
+                else:
+                    return assignment
+        return None
 
     def forwardChecking(self, assignment: Dict[Variable, Value], domains: Dict[Variable, Set[Value]], variable: Variable) -> Dict[Variable, Set[Value]]:
         """ Implement the forward checking algorithm from the theory lectures.
@@ -119,7 +161,12 @@ class CSP(ABC):
         :return: the new domains after enforcing all constraints.
         """
         # TODO: Implement CSP::forwardChecking (problem 2)
-        pass
+        val = assignment[variable]
+        for neigbor in self.neighbors(variable):
+            if domains.get(neigbor) is not None:
+                if val in domains[neigbor]:
+                    domains[neigbor].remove(val)
+        return domains
 
     def selectVariable(self, assignment: Dict[Variable, Value], domains: Dict[Variable, Set[Value]]) -> Variable:
         """ Implement a strategy to select the next variable to assign. """
