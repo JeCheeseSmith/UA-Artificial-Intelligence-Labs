@@ -134,7 +134,6 @@ class CSP(ABC):
             Use `CSP::forwardChecking` and you should no longer need to check if an assignment is valid.
             :return: a complete and valid assignment if one exists, None otherwise.
         """
-        # TODO: Implement CSP::_solveForwardChecking (problem 2)
         if self.isComplete(assignment):
             return assignment
 
@@ -160,7 +159,6 @@ class CSP(ABC):
         :param variable: The variable that was just assigned (only need to check changes).
         :return: the new domains after enforcing all constraints.
         """
-        # TODO: Implement CSP::forwardChecking (problem 2)
         val = assignment[variable]
         for neigbor in self.neighbors(variable):
             if domains.get(neigbor) is not None:
@@ -172,15 +170,38 @@ class CSP(ABC):
         """ Implement a strategy to select the next variable to assign. """
         if not self.MRV:
             return random.choice(list(self.remainingVariables(assignment)))
-
-        # TODO: Implement CSP::selectVariable (problem 2)
+        else:
+            import math
+            min = + math.inf
+            mVar = None
+            for var in self.remainingVariables(assignment):
+                if len(domains[var]) < min:
+                    min = len(domains[var])
+                    mVar = var
+            return mVar
 
     def orderDomain(self, assignment: Dict[Variable, Value], domains: Dict[Variable, Set[Value]], var: Variable) -> List[Value]:
         """ Implement a smart ordering of the domain values. """
         if not self.LCV:
             return list(domains[var])
+        else:
+            #return list(domains[var]) This gives 196 with MRV instead off 198
+            posibble = dict()
+            for option in domains.keys():
+                if option is Variable:
+                    continue
+                for el in domains[option]:
+                    if posibble.get(el) is None:
+                        posibble[el] = 1
+                    else:
+                        posibble[el] += 1
 
-        # TODO: Implement CSP::orderDomain (problem 2)
+            sorted_dict = {}
+            for key in sorted(posibble, key=posibble.get):
+                sorted_dict[key] = posibble[key]
+            temp = list(sorted_dict.keys())
+            temp.reverse()
+            return temp
 
     def solveAC3(self, initialAssignment: Dict[Variable, Value] = dict()) -> Optional[Dict[Variable, Value]]:
         """ Called to solve this CSP with AC3.
