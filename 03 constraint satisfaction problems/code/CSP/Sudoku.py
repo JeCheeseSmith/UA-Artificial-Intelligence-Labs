@@ -17,7 +17,6 @@ class Sudoku(CSP):
                 self._variables.add(var)
             self._matrix.append(temp)
 
-
     @property
     def variables(self) -> Set['Cell']:
         """ Return the set of variables in this CSP. """
@@ -93,7 +92,6 @@ class Sudoku(CSP):
                     assert val > 0 and val < 10, f"Impossible value in grid"
                     initialAssignment[var] = val
         return initialAssignment
-
 
 class Cell(Variable):
     def __init__(self, x , y):

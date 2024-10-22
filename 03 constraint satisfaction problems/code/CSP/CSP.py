@@ -107,7 +107,6 @@ class CSP(ABC):
             return assignment
 
         var = self.selectVariable(assignment, domains)
-        #for var in self.remainingVariables(assignment, domains):
         for value in self.orderDomain(assignment, domains, var):
             temp = copy.deepcopy(assignment)
             temp[var] = value
@@ -161,7 +160,6 @@ class CSP(ABC):
         :param variable: The variable that was just assigned (only need to check changes).
         :return: the new domains after enforcing all constraints.
         """
-        #val = assignment[variable]
         domains = {var: set(domain) for var, domain in domains.items()}
 
         for neigh_var in self.neighbors(variable):
@@ -190,7 +188,6 @@ class CSP(ABC):
         if not self.LCV:
             return list(domains[var])
         else:
-            #return list(domains[var]) This gives 196 with MRV instead off 198
             posibble = dict()
             for option in domains.keys():
                 if option is Variable:
