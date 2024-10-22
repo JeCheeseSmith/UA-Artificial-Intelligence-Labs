@@ -59,7 +59,6 @@ class CSP(ABC):
         """ Return whether the assignment covers all variables.
             :param assignment: dict (Variable -> value)
         """
-        # TODO: Implement CSP::isComplete (problem 1)
         return len(self.remainingVariables(assignment)) == 0
 
     @abstractmethod
@@ -137,18 +136,21 @@ class CSP(ABC):
         if self.isComplete(assignment):
             return assignment
 
+        if any(len(d) == 0 for d in domains.values()):
+            return None
+
         var = self.selectVariable(assignment, domains)
-        # for var in self.remainingVariables(assignment, domains):
         for value in self.orderDomain(assignment, domains, var):
-            temp = copy.deepcopy(assignment)
-            temp[var] = value
-            if self.isValid(temp):
-                assignment[var] = value
-                newdomains = self.forwardChecking(assignment, copy.deepcopy(domains), var)
-                if self._solveForwardChecking(assignment, newdomains) is None:
-                    assignment.pop(var)
-                else:
-                    return assignment
+            assignment[var] = value
+
+            filtered_domains = self.forwardChecking(assignment, domains, var)
+            if self.isValid(assignment):
+                resulting_assigment = self._solveForwardChecking(assignment, filtered_domains)
+                if resulting_assigment:
+                    return resulting_assigment
+
+            del assignment[var]
+
         return None
 
     def forwardChecking(self, assignment: Dict[Variable, Value], domains: Dict[Variable, Set[Value]], variable: Variable) -> Dict[Variable, Set[Value]]:
@@ -159,11 +161,14 @@ class CSP(ABC):
         :param variable: The variable that was just assigned (only need to check changes).
         :return: the new domains after enforcing all constraints.
         """
-        val = assignment[variable]
-        for neigbor in self.neighbors(variable):
-            if domains.get(neigbor) is not None:
-                if val in domains[neigbor]:
-                    domains[neigbor].remove(val)
+        #val = assignment[variable]
+        domains = {var: set(domain) for var, domain in domains.items()}
+
+        for neigh_var in self.neighbors(variable):
+            if not neigh_var in assignment:
+                for neig_val in list(domains[neigh_var]):
+                    if not self.isValidPairwise(variable, assignment[variable], neigh_var, neig_val):
+                        domains[neigh_var].remove(neig_val)
         return domains
 
     def selectVariable(self, assignment: Dict[Variable, Value], domains: Dict[Variable, Set[Value]]) -> Variable:

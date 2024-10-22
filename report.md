@@ -28,16 +28,21 @@
 
 ## (3) Constraint Satisfaction Problems - Forward Checking
 
-Number of calls for n=50 when...
+Excuse me, I changed this table because it was unclear which one should be turned on or off. This table contains all the options;
 
-|          | CSP::selectVariable | CSP::orderDomain | Both       |
-|----------|---------------------|------------------|------------|
-| Active   | 196                 | 346 - 13 985     | 198        |
-| Disabled | 229 - 10k           | 196              | 229 - 60+k |
+| (n=50)           | Number of calls |  
+|------------------|-----------------|
+| LCV OFF, MRV OFF | 63 - 60+k       |
+| LCV OFF, MRV ON  | 108             |
+| LCV ON, MRV OFF  | 229 - 10k       | 
+| LCV ON , MRV ON  | 68              |
+
+LCV <-> CSP::orderDomain 
+MRV <-> CSP::selectVariable
 
 **Explain why these functions make the algorithm faster/slower:**
 
 selectVariable / MRV is quite obvious that it make the algorithm faster; You're narrowing down the options for each variable very quickly. Thus, you can decide earlier on what is or isn't successful. 
 
 orderDomain / LCV is not so useful. I suspect because choosing random variables (no MRV) has a too high impact. 
-LCV seems more useful on bigger problems but requires more computational power. We're explicitly keeping value positions as open as possible, providing more choices so we would have more options in succeeding. However, I suspect that we're opening up too many options so it takes longer to choose.  
+LCV seems more useful on bigger problems but requires more computational power. We're explicitly keeping value positions as open as possible, providing more choices so we would have more options in succeeding. However, I suspect that we're opening up too many options so it takes longer to choose. (Especially by picking random variables) 
